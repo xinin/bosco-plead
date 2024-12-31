@@ -1,0 +1,42 @@
+{
+    "prefix": {
+        "requester": "https://example.org/requester",
+        "ec": "https://example.org/electric_company"
+    },
+    "agent": {
+        "requester:Requester1": {
+            "prov:type": "prov:Person"
+        },
+        "ec:ElectricCompany": {
+            "prov:type": "prov:Organization"
+        }
+    },
+    "entity": {
+        "requester:Documentation": {
+            "prov:label": "Initial Documentation"
+        }
+    },
+    "wasAttributedTo": {
+        "_:id1": {
+            "prov:entity": "requester:Documentation",
+            "prov:agent": "requester:Requester1"
+        }
+    },
+    "activity": {
+        "ec:CheckDocumentation": {
+            "prov:label": "Check Documentation"
+        }
+    },
+    "wasAssociatedWith": {
+        "_:id2": {
+            "prov:activity": "ec:CheckDocumentation",
+            "prov:agent": "ec:ElectricCompany"
+        }
+    },
+    "used": {
+        "_:id3": {
+            "prov:activity": "ec:CheckDocumentation",
+            "prov:entity": "requester:Documentation"
+        }
+    }
+}
