@@ -1,1 +1,0 @@
-{"prefix": {"requester": "https://example.org/requester"}, "agent": {"requester:Requester1": {"prov:type": "prov:Person"}}, "entity": {"requester:Documentation": {"prov:label": "Initial Documentation"}}, "wasAttributedTo": {"_:id1": {"prov:entity": "requester:Documentation", "prov:agent": "requester:Requester1"}}}
