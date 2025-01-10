@@ -1,0 +1,16 @@
+redis-cli -h localhost -p 6379
+
+# VER COLA
+redis-cli LRANGE task_queue 0 10
+
+# para ver todos
+redis-cli LRANGE task_queue 0 -1
+
+# Consumir un mensaje de la cola (primero):
+redis-cli LPOP task_queue
+
+# Consumir un mensaje de la cola (último):
+redis-cli RPOP task_queue
+
+# ELIMINAR TODOS LOS MENSAJES D ELA COLA
+redis-cli DEL task_queue

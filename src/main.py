@@ -1,7 +1,8 @@
 from classes.provenance import Provenance
 
 from modules.constants import Constants
-from modules.utils import serialize, deserialize, draw, get_uuid, save, visualize_prov, create_prov_state_machine
+from modules.utils import deserialize, get_uuid, save
+import time
 
 
 def send_request(uuid):
@@ -276,7 +277,8 @@ def send_decision_to_requester(uuid):
     save(provdoc, uuid,"9_send_decision_to_requester" )
 
     #visualize_prov(provdoc, output_path="outputs/"+uuid+"/prov_flow_networkx.png")
-    create_prov_state_machine(provdoc, output_path="outputs/"+uuid+"/prov_flow_networkx.png")
+    #create_prov_state_machine(provdoc, output_path="outputs/"+uuid+"/prov_flow_networkx.png")
+
 
 print("####################")
 uuid = get_uuid()
@@ -292,3 +294,9 @@ bosco_make_decision(uuid)
 send_decision_to_ec(uuid)
 send_decision_to_requester(uuid)
 
+
+print("El contenedor está en ejecución. Para detenerlo, presiona Ctrl+C.")
+
+# Bucle infinito
+while True:
+    time.sleep(1000)  # Espera 1000 segundos antes de continuar

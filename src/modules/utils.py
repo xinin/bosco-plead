@@ -2,8 +2,9 @@ import os
 import uuid
 from prov.model import ProvDocument
 from prov.dot import prov_to_dot
+import requests
+import json
 
-@staticmethod
 def serialize(document: ProvDocument, name: str):
     """
     Serializa un documento PROV en formato JSON y lo guarda en un archivo.
@@ -17,7 +18,6 @@ def serialize(document: ProvDocument, name: str):
     with open(name, "w") as file:
         file.write(document.serialize(format="json"))
 
-@staticmethod
 def deserialize(file: str) -> ProvDocument:
     """
     Deserializa un archivo en un documento PROV.
@@ -32,7 +32,6 @@ def deserialize(file: str) -> ProvDocument:
     with open(path, "r") as f:
         return ProvDocument.deserialize(content=f.read(), format="json")
 
-@staticmethod
 def draw(document: ProvDocument, name: str):
     """
     Genera un archivo PNG visualizando el documento PROV.
@@ -46,8 +45,7 @@ def draw(document: ProvDocument, name: str):
     dot = prov_to_dot(document)
     dot.write_png(name + ".png")
 
-@staticmethod
-def get_uuid() -> str:
+def get_uuid():
     """
     Genera un UUID único.
 
@@ -56,7 +54,6 @@ def get_uuid() -> str:
     """
     return str(uuid.uuid4())
 
-@staticmethod
 def save(provdoc: ProvDocument, _uuid: str, name: str):
     """
     Guarda un documento PROV serializado y genera su visualización en PNG.
@@ -69,3 +66,20 @@ def save(provdoc: ProvDocument, _uuid: str, name: str):
     path = f"outputs/{_uuid}"
     serialize(provdoc, f"{path}/provdoc.json")
     draw(provdoc, f"{path}/{name}")
+
+
+def make_post_request(url, data):
+    try:
+        # Realizar la solicitud POST, enviando los datos como JSON
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(url, data=json.dumps(data), headers=headers)
+        
+        # Verificar si la solicitud fue exitosa (código de estado 200)
+        if response.status_code == 200:
+            return response.json()  # Retorna el contenido de la respuesta como JSON
+        else:
+            return {"error": "Error en la solicitud", "status_code": response.status_code}
+    
+    except requests.exceptions.RequestException as e:
+        # Capturar cualquier error que ocurra durante la solicitud
+        return {"error": str(e)}

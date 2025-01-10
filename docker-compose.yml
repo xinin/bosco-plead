@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  electric_company_back:
+    build:
+        context: ./electric_company
+        dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: bind
+        source: ./electric_company/src
+        target: /app/src
+      - type: bind
+        source: ./outputs
+        target: /app/outputs
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - electric_network
+
+  bosco:
+    restart: always
+    build:
+        context: ./bosco
+        dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./bosco/src
+        target: /app/src
+      - type: bind
+        source: ./outputs
+        target: /app/outputs
+    ports:
+      - "8081:8081"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - electric_network
+
+  redis:
+    image: "redis:latest"
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - electric_network
+
+networks:
+  electric_network:
+    driver: bridge
