@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Contacto - Compañía Eléctrica</title>
+    <style>
+        /* Estilos Generales */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Encabezado */
+        header {
+            background-color: #0a1f2d; /* Azul oscuro */
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        /* Formulario */
+        .form-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container h2 {
+            color: #0a1f2d; /* Azul */
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        label {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus {
+            border-color: #ffcc00; /* Amarillo eléctrico */
+            outline: none;
+        }
+
+        button[type="submit"] {
+            background-color: #ffcc00; /* Amarillo eléctrico */
+            color: white;
+            font-size: 1.2rem;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #e6b800; /* Amarillo más oscuro */
+        }
+
+        /* Estilo para los mensajes de éxito */
+        .success-message {
+            text-align: center;
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        /* Responsividad */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            button[type="submit"] {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Compañía Eléctrica</h1>
+    </header>
+
+    <div class="form-container">
+        <h2>Formulario de solicitud</h2>
+        <form method="POST">
+            <!-- Desplegable para seleccionar el usuario -->
+            <label for="userSelect">Selecciona el usuario:</label>
+            <select id="userSelect" name="userSelect" required>
+                <option value="">Selecciona...</option>
+                <option value="usuario1">Usuario  1(OK)</option>
+                <option value="usuario2">Usuario 2 (KO)</option>
+            </select>
+
+            <!-- Campos comunes para todos -->
+            <div id="commonFields">
+                <label for="name">Nombre:</label>
+                <input type="text" id="name" name="name" required placeholder="Ingresa tu nombre" readonly>
+
+                <label for="surname">Apellidos:</label>
+                <input type="text" id="surname" name="surname" required placeholder="Ingresa tu apellido" readonly>
+
+                <label for="dni">DNI:</label>
+                <input type="text" id="dni" name="dni" required placeholder="Ingresa tu DNI" readonly>
+
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" name="email" required placeholder="Ingresa tu correo electrónico" readonly>
+            </div>
+
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+
+    <script>
+        // Datos predefinidos para los usuarios
+        const users = {
+            "usuario1": {
+                name: "Juan Pérez",
+                surname: "Pérez Gómez",
+                dni: "12345678A",
+                email: "juan.perez@email.com"
+            },
+            "usuario2": {
+                name: "Ana Gómez",
+                surname: "Gómez López",
+                dni: "87654321B",
+                email: "ana.gomez@email.com"
+            }
+        };
+
+        // Función para autocompletar el formulario según el usuario seleccionado
+        document.getElementById('userSelect').addEventListener('change', function() {
+            const userSelection = this.value;
+            
+            // Verificar si se seleccionó un usuario válido
+            if (userSelection && users[userSelection]) {
+                // Autocompletar los campos con los datos del usuario seleccionado
+                const user = users[userSelection];
+                document.getElementById('name').value = user.name;
+                document.getElementById('surname').value = user.surname;
+                document.getElementById('dni').value = user.dni;
+                document.getElementById('email').value = user.email;
+            } else {
+                // Limpiar los campos si no hay selección o es inválida
+                document.getElementById('name').value = '';
+                document.getElementById('surname').value = '';
+                document.getElementById('dni').value = '';
+                document.getElementById('email').value = '';
+            }
+        });
+    </script>
+
+</body>
+</html>
