@@ -3,7 +3,7 @@ from classes.tax_office import TaxOffice
 from modules.constants import Constants
 
 from modules.constants import Constants
-from modules.utils import deserialize, save, load_json, save_json
+from modules.utils import deserialize, save, load_json, save_json, make_post_request
 
 
 def bosco_preprocess_documentation(uuid):
@@ -35,9 +35,6 @@ def bosco_preprocess_documentation(uuid):
     Provenance.wasAssociatedWith(provdoc, preprocess_documentation, bosco)
 
     save(provdoc, uuid, "4_bosco_preprocess_documentation")
-
-    return True
-
 
 def bosco_ask_information_to_tax_office(uuid):
     # Get ProvDoc
@@ -76,8 +73,16 @@ def bosco_ask_information_to_tax_office(uuid):
     if not tax_office_data:
         data["status"] = Constants.REQUEST_STATUS_KO
         data["msg"] = "There are not tax data available."
-        save_json(uuid, data)
+
+        # Create entity Decision
+        decision = Provenance.create_entity(provdoc, nm_gov["Decision"], "Decision")
+        Provenance.wasAttributedTo(provdoc, decision, bosco)
+        Provenance.wasGeneratedBy(provdoc, decision, retrieve_tax_info)
+        Provenance.wasDerivedFrom(provdoc, decision, retrieve_tax_info)
+
         save(provdoc, uuid, "5_bosco_ask_tax_info")
+        save_json(uuid, data)
+
         return False
 
     # Create entity TAX INFO
@@ -253,9 +258,6 @@ def bosco_make_decision(uuid):
     data["msg"] =  bosco_decision['msg']
     save_json(uuid, data)
 
-    return True
-
-
 def send_decision_to_ec(uuid):
     # Get ProvDoc
     provdoc = deserialize(uuid)
@@ -272,8 +274,11 @@ def send_decision_to_ec(uuid):
     decision = Provenance.get_entity_by_id(provdoc, nm_gov["Decision"])
 
     # Get MakeDecision
-    make_decision = Provenance.get_activity_by_id(provdoc, nm_gov["MakeDecision"])
-
+    try:
+        make_decision = Provenance.get_activity_by_id(provdoc, nm_gov["MakeDecision"])
+    except:
+        make_decision = None
+    
     # BOSCO send decision to EC
     send_decision_to_ec = Provenance.create_activity(
         provdoc, nm_gov["SendDecision"], "Send the Decision to EC"
@@ -281,6 +286,9 @@ def send_decision_to_ec(uuid):
     Provenance.wasAssociatedWith(provdoc, send_decision_to_ec, bosco)
     Provenance.wasAssociatedWith(provdoc, send_decision_to_ec, electric_company)
     Provenance.used(provdoc, send_decision_to_ec, decision)
-    Provenance.wasInformedBy(provdoc, send_decision_to_ec, make_decision)
+    if make_decision:
+        Provenance.wasInformedBy(provdoc, send_decision_to_ec, make_decision)
 
     save(provdoc, uuid, "8_send_decision_to_ec")
+
+    make_post_request("http://electric_company_back:8080/api/decision", {"uuid": uuid})

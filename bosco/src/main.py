@@ -13,36 +13,31 @@ from classes.steps import (
     send_decision_to_ec,
 )
 
-
 def process_task(task):
     """Procesa la tarea (simulación de trabajo)."""
     uuid = task.get("uuid")
     print(f"Preprocessing documentation for the request {uuid}")
     time.sleep(4)  # Simula que está trabajando en la tarea
-    if not bosco_preprocess_documentation(uuid):
-        return
-    
+    bosco_preprocess_documentation(uuid)
+
     print(f"Retrieving tax information for the request {uuid}")
     time.sleep(4)  # Simula que está trabajando en la tarea
     tax_data = bosco_ask_information_to_tax_office(uuid)
     if not tax_data:
-        return
-    
+        return send_decision_to_ec(uuid)
+
     print(f"Crossing request and tax information for the request {uuid}")
     time.sleep(4)  # Simula que está trabajando en la tarea
-    if not bosco_cross_data(uuid, tax_data):
-        return
-    
+    bosco_cross_data(uuid, tax_data)
+
     print(f"Making a decision for the request {uuid}")
     time.sleep(4)  # Simula que está trabajando en la tarea
-    if not bosco_make_decision(uuid):
-        return
-    
+    bosco_make_decision(uuid)
+
     print(f"Sending decision to the EC for the request {uuid}")
     time.sleep(4)  # Simula que está trabajando en la tarea
-    if not send_decision_to_ec(uuid):
-        return
-    
+    send_decision_to_ec(uuid)
+
     print(f"Task {task} proccessed.")
 
 

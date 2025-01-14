@@ -1,7 +1,7 @@
 import os
 
 import redis
-from flask import Flask, request, render_template, request, url_for, redirect
+from flask import Flask, request, render_template, request, url_for, redirect, jsonify
 
 from modules.utils import get_uuid, load_json
 
@@ -11,6 +11,7 @@ from classes.steps import (
     create_request,
     send_documentation_checked_to_gov,
     check_documentation,
+    send_decision_to_requester,
 )
 
 # Conexión a Redis
@@ -21,6 +22,7 @@ app = Flask(
     template_folder=os.path.join(os.getcwd(), "templates"),
     static_folder="outputs",
 )
+
 
 # Página principal con el formulario
 @app.route("/", methods=["GET", "POST"])
@@ -70,6 +72,7 @@ def success():
     # Renderizar el template 'success.html' pasando el valor del parámetro
     return render_template("success.html", uuid=uuid)
 
+
 @app.route("/provenance")
 def provenance():
     # Obtener el parámetro de la query string 'uuid'
@@ -88,15 +91,36 @@ def provenance():
         {"step": 6, "name": "data_crossed"},
         {"step": 7, "name": "make_decision"},
         {"step": 8, "name": "send_decision_to_ec"},
+        {"step": 9, "name": "send_decision_to_requester"},
     ]
 
     # Comprobar si la imagen existe para cada paso
     for step in steps:
         image_path = f"outputs/{uuid}/{step['step']}_{step['name']}.png"
-        step['exists'] = os.path.exists(image_path)
+        step["exists"] = os.path.exists(image_path)
 
     # Renderizar el template 'provenance.html' pasando los datos necesarios
     return render_template("provenance.html", uuid=uuid, data=data, steps=steps)
+
+
+# Endpoint POST que recibe datos JSON y los devuelve
+@app.route("/api/decision", methods=["POST"])
+def handle_data():
+    # Obtener los datos JSON del cuerpo de la solicitud
+    data = request.get_json()
+
+    # Verificar que los datos sean válidos
+    if not data:
+        return jsonify({"error": "No se enviaron datos JSON"}), 400
+
+    uuid = data.get("uuid")
+    if not uuid:
+        return jsonify({"error": "No se enviaron UUID"}), 400
+
+    send_decision_to_requester(uuid)
+
+    return jsonify({"message": "Datos recibidos con éxito"}), 200
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)

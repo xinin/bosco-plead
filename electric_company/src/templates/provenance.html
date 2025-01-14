@@ -204,6 +204,11 @@
             <h3>Paso 8: (BOSCO) Enviar resolución a la compañía electrica</h3>
             <img src="{{ 'outputs/' + uuid + '/8_send_decision_to_ec.png' }}" alt="provenance" onclick="openLightbox(this)">
         {% endif %}
+
+        {% if steps[8].exists %}
+            <h3>Paso 9: (EC) Enviar resolución al peticionario</h3>
+            <img src="{{ 'outputs/' + uuid + '/9_send_decision_to_requester.png' }}" alt="provenance" onclick="openLightbox(this)">
+        {% endif %}
     </div>
 
     <!-- Lightbox (Ventana emergente para la imagen ampliada) -->
