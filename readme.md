@@ -2,6 +2,10 @@
 
 Este repositorio contiene el entorno necesario para emular el flujo de un sistema de solicitud de bono social entre diferentes actores: una **compañía eléctrica**, el **gobierno** y una **cola de procesamiento** utilizando Docker.
 
+![image](screenshoot_form.png)
+
+![image](screenshoot_provenance.png)
+
 ## Levantar el entorno con Docker
 
 Para levantar el entorno completo, utiliza el siguiente comando en tu terminal:
