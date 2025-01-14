@@ -36,6 +36,7 @@ def bosco_preprocess_documentation(uuid):
 
     save(provdoc, uuid, "4_bosco_preprocess_documentation")
 
+
 def bosco_ask_information_to_tax_office(uuid):
     # Get ProvDoc
     provdoc = deserialize(uuid)
@@ -254,9 +255,10 @@ def bosco_make_decision(uuid):
 
     save(provdoc, uuid, "7_make_decision")
 
-    data["status"] = bosco_decision['status']
-    data["msg"] =  bosco_decision['msg']
+    data["status"] = bosco_decision["status"]
+    data["msg"] = bosco_decision["msg"]
     save_json(uuid, data)
+
 
 def send_decision_to_ec(uuid):
     # Get ProvDoc
@@ -276,9 +278,9 @@ def send_decision_to_ec(uuid):
     # Get MakeDecision
     try:
         make_decision = Provenance.get_activity_by_id(provdoc, nm_gov["MakeDecision"])
-    except:
+    except ValueError:
         make_decision = None
-    
+
     # BOSCO send decision to EC
     send_decision_to_ec = Provenance.create_activity(
         provdoc, nm_gov["SendDecision"], "Send the Decision to EC"
