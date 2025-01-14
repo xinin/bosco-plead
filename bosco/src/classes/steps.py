@@ -293,4 +293,4 @@ def send_decision_to_ec(uuid):
 
     save(provdoc, uuid, "8_send_decision_to_ec")
 
-    make_post_request("http://electric_company_back:8080/api/decision", {"uuid": uuid})
+    make_post_request("http://electric_company:8080/api/decision", {"uuid": uuid})
