@@ -13,21 +13,38 @@ from classes.steps import (
     send_decision_to_ec,
 )
 
+
 def process_task(task):
     """Procesa la tarea (simulación de trabajo)."""
     uuid = task.get("uuid")
-    print(f"Procesando tarea: {uuid}")
-    time.sleep(2)  # Simula que está trabajando en la tarea por 2 segundos
-    bosco_preprocess_documentation(uuid)
-    time.sleep(2)  # Simula que está trabajando en la tarea por 2 segundos
-    bosco_ask_information_to_tax_office(uuid)
-    time.sleep(2)  # Simula que está trabajando en la tarea por 2 segundos
-    bosco_cross_data(uuid)
-    time.sleep(2)  # Simula que está trabajando en la tarea por 2 segundos
-    bosco_make_decision(uuid)
-    time.sleep(2)  # Simula que está trabajando en la tarea por 2 segundos
-    send_decision_to_ec(uuid)
-    print(f"Tarea {task} procesada.")
+    print(f"Preprocessing documentation for the request {uuid}")
+    time.sleep(4)  # Simula que está trabajando en la tarea
+    if not bosco_preprocess_documentation(uuid):
+        return
+    
+    print(f"Retrieving tax information for the request {uuid}")
+    time.sleep(4)  # Simula que está trabajando en la tarea
+    tax_data = bosco_ask_information_to_tax_office(uuid)
+    if not tax_data:
+        return
+    
+    print(f"Crossing request and tax information for the request {uuid}")
+    time.sleep(4)  # Simula que está trabajando en la tarea
+    if not bosco_cross_data(uuid, tax_data):
+        return
+    
+    print(f"Making a decision for the request {uuid}")
+    time.sleep(4)  # Simula que está trabajando en la tarea
+    if not bosco_make_decision(uuid):
+        return
+    
+    print(f"Sending decision to the EC for the request {uuid}")
+    time.sleep(4)  # Simula que está trabajando en la tarea
+    if not send_decision_to_ec(uuid):
+        return
+    
+    print(f"Task {task} proccessed.")
+
 
 def worker():
     """Worker que espera y procesa mensajes de la cola de Redis."""
@@ -57,6 +74,7 @@ app = Flask(__name__)
 # Conexión a Redis
 redis_client = redis.StrictRedis(host="redis", port=6379, db=0, decode_responses=True)
 
+
 # Endpoint POST que recibe datos JSON y los devuelve
 @app.route("/api/data", methods=["POST"])
 def handle_data():
@@ -78,6 +96,7 @@ def handle_data():
     print("Peticion con UUID: " + uuid + " añadida a la cola de trabajo.")
 
     return jsonify({"message": "Datos recibidos con éxito", "data": data}), 200
+
 
 if __name__ == "__main__":
     # Iniciar el worker en un hilo

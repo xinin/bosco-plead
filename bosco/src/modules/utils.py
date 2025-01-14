@@ -83,3 +83,34 @@ def make_post_request(url, data):
     except requests.exceptions.RequestException as e:
         # Capturar cualquier error que ocurra durante la solicitud
         return {"error": str(e)}
+    
+def save_json(_uuid, data):
+
+    path = f"outputs/{_uuid}/data.json"
+
+    # Obtener la ruta del directorio donde se va a guardar el archivo
+    dir = os.path.dirname(path)
+
+    # Si el directorio no existe, lo crea
+    if dir and not os.path.exists(dir):
+        os.makedirs(dir)
+
+    # Abrir el archivo en modo escritura ('w')
+    with open(path, "w", encoding="utf-8") as f:
+        # Convertir el diccionario a JSON y escribirlo en el archivo
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+
+def load_json(_uuid):
+    path = f"outputs/{_uuid}/data.json"
+
+    # Verificar si el archivo existe
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"El archivo {path} no existe.")
+
+    # Abrir el archivo en modo lectura ('r')
+    with open(path, "r", encoding="utf-8") as f:
+        # Cargar el contenido del archivo JSON
+        data = json.load(f)
+
+    return data

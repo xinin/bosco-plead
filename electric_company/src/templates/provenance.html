@@ -125,6 +125,16 @@
             color: white; /* Asegurarse de que no cambie el color al pasar el ratón */
         }
 
+        .status-ok {
+            color: green;
+        }
+        .status-ko {
+            color: red;
+        }
+        .status-pending {
+            color: rgb(255, 174, 0);
+        }
+
 
     </style>
 </head>
@@ -139,33 +149,62 @@
     <div class="form-container">
         <h1>Provenance</h1>
         <h2>Petición: {{ uuid }}</h2>
-
-        <h3>Paso 1: (EC) Crear nueva petición</h3>
-        <img src="{{ 'outputs/' + uuid + '/1_send_request.png' }}" alt="provenance" onclick="openLightbox(this)">
-
-        <h3>Paso 2: (EC) Verificar que la información necesaría está incluida</h3>
-        <img src="{{ 'outputs/' + uuid + '/2_check_documentation.png' }}" alt="provenance" onclick="openLightbox(this)">
-
-        <h3>Paso 3: (EC) Enviar petición a BOSCO</h3>
-        <img src="{{ 'outputs/' + uuid + '/3_send_documentation_checked_to_gov.png' }}" alt="provenance" onclick="openLightbox(this)">
-
-        <h3>Paso 4: (BOSCO) Preprocesar la información</h3>
-        <img src="{{ 'outputs/' + uuid + '/4_bosco_preprocess_documentation.png' }}" alt="provenance" onclick="openLightbox(this)">
-
-        <h3>Paso 5: (BOSCO) Pedir datos del peticionario a Hacienda</h3>
-        <img src="{{ 'outputs/' + uuid + '/5_bosco_ask_tax_info.png' }}" alt="provenance" onclick="openLightbox(this)">
-
-        <h3>Paso 6: (BOSCO) Cruzar datos de Hacienda</h3>
-        <img src="{{ 'outputs/' + uuid + '/6_data_crossed.png' }}" alt="provenance" onclick="openLightbox(this)">
-
-        <h3>Paso 7: (BOSCO) Tomar una decisión</h3>
-        <img src="{{ 'outputs/' + uuid + '/7_make_decision.png' }}" alt="provenance" onclick="openLightbox(this)">
-
-        <h3>Paso 8: (BOSCO) Enviar resolución a la compañía electrica</h3>
-        <img src="{{ 'outputs/' + uuid + '/8_send_decision_to_ec.png' }}" alt="provenance" onclick="openLightbox(this)">
-
+        <h3>
+            {% if data.status == 1 %}
+                <span class="status-ok"><b>OK</b></span>
+            {% elif data.status == 2 %}
+                <span class="status-ko"><b>KO</b></span>
+            {% elif data.status == 3 %}
+                <span class="status-pending"><b>PENDING</b></span>
+            {% else %}
+                <span>Estado desconocido</span>
+            {% endif %}
+            {{ data.msg }}
+        </h3>
+    
+        <h3>Detalles adicionales:</h3>
+        <pre>{{ data | tojson(indent=4) }}</pre>
+    
+        {% if steps[0].exists %}
+            <h3>Paso 1: (EC) Crear nueva petición</h3>
+            <img src="{{ 'outputs/' + uuid + '/1_send_request.png' }}" alt="provenance" onclick="openLightbox(this)">
+        {% endif %}
+    
+        {% if steps[1].exists %}
+            <h3>Paso 2: (EC) Verificar que la información necesaría está incluida</h3>
+            <img src="{{ 'outputs/' + uuid + '/2_check_documentation.png' }}" alt="provenance" onclick="openLightbox(this)">
+        {% endif %}
+    
+        {% if steps[2].exists %}
+            <h3>Paso 3: (EC) Enviar petición a BOSCO</h3>
+            <img src="{{ 'outputs/' + uuid + '/3_send_documentation_checked_to_gov.png' }}" alt="provenance" onclick="openLightbox(this)">
+        {% endif %}
+    
+        {% if steps[3].exists %}
+            <h3>Paso 4: (BOSCO) Preprocesar la información</h3>
+            <img src="{{ 'outputs/' + uuid + '/4_bosco_preprocess_documentation.png' }}" alt="provenance" onclick="openLightbox(this)">
+        {% endif %}
+    
+        {% if steps[4].exists %}
+            <h3>Paso 5: (BOSCO) Pedir datos del peticionario a Hacienda</h3>
+            <img src="{{ 'outputs/' + uuid + '/5_bosco_ask_tax_info.png' }}" alt="provenance" onclick="openLightbox(this)">
+        {% endif %}
+    
+        {% if steps[5].exists %}
+            <h3>Paso 6: (BOSCO) Cruzar datos de Hacienda</h3>
+            <img src="{{ 'outputs/' + uuid + '/6_data_crossed.png' }}" alt="provenance" onclick="openLightbox(this)">
+        {% endif %}
+    
+        {% if steps[6].exists %}
+            <h3>Paso 7: (BOSCO) Tomar una decisión</h3>
+            <img src="{{ 'outputs/' + uuid + '/7_make_decision.png' }}" alt="provenance" onclick="openLightbox(this)">
+        {% endif %}
+    
+        {% if steps[7].exists %}
+            <h3>Paso 8: (BOSCO) Enviar resolución a la compañía electrica</h3>
+            <img src="{{ 'outputs/' + uuid + '/8_send_decision_to_ec.png' }}" alt="provenance" onclick="openLightbox(this)">
+        {% endif %}
     </div>
-
 
     <!-- Lightbox (Ventana emergente para la imagen ampliada) -->
     <div id="lightbox" class="lightbox" onclick="closeLightbox()">

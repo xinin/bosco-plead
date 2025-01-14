@@ -1,7 +1,9 @@
 from classes.provenance import Provenance
 from modules.constants import Constants
 
-from modules.utils import deserialize, save, save_json, make_post_request
+from modules.utils import deserialize, save, save_json, make_post_request, load_json
+from modules.constants import Constants
+
 
 def create_request(uuid, requester_data):
 
@@ -24,7 +26,7 @@ def create_request(uuid, requester_data):
         provdoc,
         nm_requester[Constants.AGENT_ID_Requester],
         Constants.AGENT_TYPE_PERSON,
-        requester_data.get('dni'),
+        requester_data.get("dni"),
     )
     electric_company = Provenance.create_agent(
         provdoc,
@@ -50,6 +52,8 @@ def create_request(uuid, requester_data):
 
     save(provdoc, uuid, "1_send_request")
 
+    return True
+
 
 def check_documentation(uuid):
 
@@ -64,9 +68,6 @@ def check_documentation(uuid):
     nm_requester = Provenance.get_namespace_by_id(
         provdoc, Constants.NM_REQUESTER["prefix"]
     )
-    requester = Provenance.get_agent_by_id(
-        provdoc, nm_requester[Constants.AGENT_ID_Requester]
-    )
 
     # Get Activity Send to EC
     send_to_ec = Provenance.get_activity_by_id(provdoc, nm_requester["SendToEC"])
@@ -74,12 +75,8 @@ def check_documentation(uuid):
     # Get Documentation entity
     documentation = Provenance.get_entity_by_id(provdoc, nm_requester["Documentation"])
 
-    # Create entity documentation checked
-    documentation_checked = Provenance.create_entity(
-        provdoc, nm_ec["DocumentationChecked"], "Documentation checked"
-    )
-    Provenance.wasDerivedFrom(provdoc, documentation_checked, documentation)
-    Provenance.wasAttributedTo(provdoc, documentation_checked, electric_company)
+    # Get request information
+    data = load_json(uuid)
 
     # Create activity Check Documentation
     documentation_check = Provenance.create_activity(
@@ -88,14 +85,46 @@ def check_documentation(uuid):
     Provenance.wasAssociatedWith(provdoc, documentation_check, electric_company)
     Provenance.wasInformedBy(provdoc, documentation_check, send_to_ec)
     Provenance.used(provdoc, documentation_check, documentation)
+
+    # Check Documentation
+    print("VERIFICANDO DATOS")
+    required_fields = ["name", "surname", "dni", "email"]
+    for field in required_fields:
+        print("FIELD", field, data[field])
+        if not data.get(field):
+            msg = f"Check documentation failed. Field '{field}' is mandatory and it can not be None."
+            data['status'] = Constants.REQUEST_STATUS_KO
+            data['msg'] = msg
+            save_json(uuid, data)
+
+            # Create entity documentation invalid
+            documentation_invalid = Provenance.create_entity(
+                provdoc, nm_ec["DocumentationInvalid"], "Documentation invalid"
+            )
+            Provenance.wasDerivedFrom(provdoc, documentation_invalid, documentation)
+            Provenance.wasAttributedTo(provdoc, documentation_invalid, electric_company)
+            Provenance.wasGeneratedBy(
+                provdoc, documentation_invalid, documentation_check
+            )
+
+            save(provdoc, uuid, "2_check_documentation")
+
+            return False
+
+    # Create entity documentation checked
+    documentation_checked = Provenance.create_entity(
+        provdoc, nm_ec["DocumentationChecked"], "Documentation checked"
+    )
+    Provenance.wasDerivedFrom(provdoc, documentation_checked, documentation)
+    Provenance.wasAttributedTo(provdoc, documentation_checked, electric_company)
     Provenance.wasGeneratedBy(provdoc, documentation_checked, documentation_check)
 
     save(provdoc, uuid, "2_check_documentation")
 
+    return True
+
 
 def send_documentation_checked_to_gov(uuid):
-
-    make_post_request("http://bosco:8081/api/data", {"uuid": uuid})
 
     # Get ProvDoc
     provdoc = deserialize(uuid)
@@ -145,4 +174,9 @@ def send_documentation_checked_to_gov(uuid):
     Provenance.wasAssociatedWith(provdoc, send_to_gov, electric_company)
     Provenance.wasAssociatedWith(provdoc, send_to_gov, bosco)
 
+    # Send request to BOSCO
+    make_post_request("http://bosco:8081/api/data", {"uuid": uuid})
+
     save(provdoc, uuid, "3_send_documentation_checked_to_gov")
+
+    return True

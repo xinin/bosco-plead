@@ -126,8 +126,12 @@
             <label for="userSelect">Selecciona el usuario:</label>
             <select id="userSelect" name="userSelect" required>
                 <option value="">Selecciona...</option>
-                <option value="usuario1">Usuario  1(OK)</option>
-                <option value="usuario2">Usuario 2 (KO)</option>
+                <option value="usuario0">Usuario 0 (KO Check Documentation.)</option>
+                <option value="usuario1">Usuario 1 (KO No Tax information.)</option>
+                <option value="usuario2">Usuario 2 (KO Incomes > 10,000€.)</option>
+                <option value="usuario3">Usuario 3 (KO Widow, Incomes > 10,000€, no dependent children)</option>
+                <option value="usuario4">Usuario 4 (KO Married, Incomes > €10,000, no dependent children.)</option>
+                <option value="usuario5">Usuario 5 (OK Incomes over €10,000, but dependent children.)</option>
             </select>
 
             <!-- Campos comunes para todos -->
@@ -150,19 +154,44 @@
     </div>
 
     <script>
+
         // Datos predefinidos para los usuarios
         const users = {
-            "usuario1": {
+            "usuario0": { // KO Check Documentation
+                name: "Pedro",
+                surname: "Gómez García",
+                dni: "",
+                email: "pedro.gomez@email.com"
+            },
+            "usuario1": { // KO No Tax information
                 name: "Juan Pérez",
                 surname: "Pérez Gómez",
                 dni: "12345678A",
                 email: "juan.perez@email.com"
             },
-            "usuario2": {
+            "usuario2": { // KO Income over €10,000 and no dependent children. 
                 name: "Ana Gómez",
                 surname: "Gómez López",
                 dni: "87654321B",
                 email: "ana.gomez@email.com"
+            },
+            "usuario3": {  // KO Widow, but with incomes > 10,000€ and no dependent children
+                name: "Laura Fernández",
+                surname: "Fernández García",
+                dni: "22334455D",
+                email: "laura.fernandez@email.com"
+            },
+            "usuario4": {  // KO Married and income over €10,000, no dependent children.
+                name: "Carlos Sánchez",
+                surname: "Sánchez Rodríguez",
+                dni: "55667788G",
+                email: "carlos.sanchez@email.com"
+            },
+            "usuario5": {  // OK income over €10,000, but have dependent children.
+                name: "José Ruiz",
+                surname: "Ruiz Sánchez",
+                dni: "33445566E",
+                email: "jose.ruiz@email.com"
             }
         };
 
