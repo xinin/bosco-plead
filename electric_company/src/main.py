@@ -53,24 +53,15 @@ def home():
 
         # Comprobar que los datos son correctos
         if not check_documentation(uuid):
-            return redirect(url_for("success", uuid=uuid))
+            return redirect(url_for("provenance", uuid=uuid))
 
         # Enviar los datos a BOSCO para comprobar si el peticionario puede acceder al BONO SOCIAL
         send_documentation_checked_to_gov(uuid)
 
         # Redirigir a una página de éxito
-        return redirect(url_for("success", uuid=uuid))
+        return redirect(url_for("provenance", uuid=uuid))
 
     return render_template("index.html")
-
-
-@app.route("/success")
-def success():
-    # Obtener el parámetro de la query string 'mensaje'
-    uuid = request.args.get("uuid")
-
-    # Renderizar el template 'success.html' pasando el valor del parámetro
-    return render_template("success.html", uuid=uuid)
 
 
 @app.route("/provenance")
